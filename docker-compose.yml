@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:14
+    restart: always
+    container_name: "db"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: abcd10
+      POSTGRES_DB: hh_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  telegram_bot:
+    image: python:3.10
+    restart: always
+    container_name: "bot"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://postgres:abcd10@db:5432/hh_db
+      BOT_TOKEN: "7420447400:AAH1Me8HXvH3IMAu9sejrSfVbd77LtbN7Bc"
+    volumes:
+      - ./:/app
+    command: bash -c "pip install -r /app/requirements.txt && python /app/main.py"
+
+volumes:
+  db_data:
+      
